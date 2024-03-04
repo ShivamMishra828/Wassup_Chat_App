@@ -21,7 +21,7 @@ const GeneralApp = () => {
           backgroundColor:
             theme.palette.mode === "light"
               ? "#f0f4fa"
-              : theme.palette.background.default,
+              : theme.palette.background.paper,
         }}
       >
         <Conversation />

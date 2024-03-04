@@ -40,7 +40,7 @@ const TextMsg = ({ data }) => {
         p={1.5}
         sx={{
           backgroundColor: data.incoming
-            ? theme.palette.background.paper
+            ? theme.palette.background.default
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -67,7 +67,7 @@ const MediaMsg = ({ data }) => {
         p={1.5}
         sx={{
           backgroundColor: data.incoming
-            ? theme.palette.background.paper
+            ? theme.palette.background.default
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -143,7 +143,7 @@ const LinkMsg = ({ data }) => {
         p={1.5}
         sx={{
           backgroundColor: data.incoming
-            ? theme.palette.background.paper
+            ? theme.palette.background.default
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -201,7 +201,7 @@ const DocMsg = ({ data }) => {
         p={1.5}
         sx={{
           backgroundColor: data.incoming
-            ? theme.palette.background.paper
+            ? theme.palette.background.default
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -214,7 +214,7 @@ const DocMsg = ({ data }) => {
             spacing={3}
             alignItems={"center"}
             sx={{
-              backgroundColor: theme.palette.background.default,
+              backgroundColor: theme.palette.background.paper,
               borderRadius: 1,
             }}
           >

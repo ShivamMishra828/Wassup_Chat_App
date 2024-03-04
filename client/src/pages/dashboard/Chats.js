@@ -27,7 +27,7 @@ const ChatElement = ({ id, name, image, msg, time, unread, online }) => {
         backgroundColor:
           theme.palette.mode === "light"
             ? "#fff"
-            : theme.palette.background.default,
+            : theme.palette.background.paper,
       }}
     >
       <Stack
@@ -137,7 +137,7 @@ const Chats = () => {
           backgroundColor:
             theme.palette.mode === "light"
               ? "#f8faff"
-              : theme.palette.background.paper,
+              : theme.palette.background.default,
           boxShadow: "0 0 2px rgba(0, 0, 0, 0.25)",
         }}
       >
