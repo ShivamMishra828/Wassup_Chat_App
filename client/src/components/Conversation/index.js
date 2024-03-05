@@ -18,7 +18,7 @@ const Conversation = () => {
           overflowY: "auto",
         }}
       >
-        <Message />
+        <Message menu={true} />
       </Box>
 
       {/* Footer */}

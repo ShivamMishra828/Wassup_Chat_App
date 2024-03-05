@@ -75,7 +75,7 @@ const Timeline = ({ data }) => {
   );
 };
 
-const TextMsg = ({ data }) => {
+const TextMsg = ({ data, menu }) => {
   const theme = useTheme();
   return (
     <Stack direction={"row"} justifyContent={data.incoming ? "start" : "end"}>
@@ -98,12 +98,12 @@ const TextMsg = ({ data }) => {
           {data.message}
         </Typography>
       </Box>
-      <MessageOptions />
+      {menu && <MessageOptions />}
     </Stack>
   );
 };
 
-const MediaMsg = ({ data }) => {
+const MediaMsg = ({ data, menu }) => {
   const theme = useTheme();
   return (
     <Stack direction={"row"} justifyContent={data.incoming ? "start" : "end"}>
@@ -134,12 +134,12 @@ const MediaMsg = ({ data }) => {
           </Typography>
         </Stack>
       </Box>
-      <MessageOptions />
+      {menu && <MessageOptions />}
     </Stack>
   );
 };
 
-const ReplyMsg = ({ data }) => {
+const ReplyMsg = ({ data, menu }) => {
   const theme = useTheme();
   return (
     <Stack direction={"row"} justifyContent={data.incoming ? "start" : "end"}>
@@ -176,12 +176,12 @@ const ReplyMsg = ({ data }) => {
           </Typography>
         </Stack>
       </Box>
-      <MessageOptions />
+      {menu && <MessageOptions />}
     </Stack>
   );
 };
 
-const LinkMsg = ({ data }) => {
+const LinkMsg = ({ data, menu }) => {
   const theme = useTheme();
   return (
     <Stack direction={"row"} justifyContent={data.incoming ? "start" : "end"}>
@@ -235,12 +235,12 @@ const LinkMsg = ({ data }) => {
           </Stack>
         </Stack>
       </Box>
-      <MessageOptions />
+      {menu && <MessageOptions />}
     </Stack>
   );
 };
 
-const DocMsg = ({ data }) => {
+const DocMsg = ({ data, menu }) => {
   const theme = useTheme();
   return (
     <Stack direction={"row"} justifyContent={data.incoming ? "start" : "end"}>
@@ -281,7 +281,7 @@ const DocMsg = ({ data }) => {
           </Typography>
         </Stack>
       </Box>
-      <MessageOptions />
+      {menu && <MessageOptions />}
     </Stack>
   );
 };
