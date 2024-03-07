@@ -7,12 +7,13 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { MagnifyingGlass, Plus } from "phosphor-react";
 import { alpha, styled, useTheme } from "@mui/material/styles";
 import { SimpleBarStyle } from "../../components/Scrollbar";
 import { ChatList } from "../../data";
 import ChatElement from "../../components/ChatElement";
+import CreateGroup from "../../sections/main/CreateGroup";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -45,6 +46,13 @@ const SearchInputBase = styled(InputBase)(({ theme }) => ({
 
 const Group = () => {
   const theme = useTheme();
+  const [openDialog, setOpenDialog] = useState(false);
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
   return (
     <>
       <Stack
@@ -99,7 +107,7 @@ const Group = () => {
               <Typography variant="subtitle2" component={Link}>
                 Create new group
               </Typography>
-              <IconButton>
+              <IconButton onClick={handleOpenDialog}>
                 <Plus
                   style={{
                     color: theme.palette.primary.main,
@@ -131,6 +139,9 @@ const Group = () => {
           </Stack>
         </Box>
       </Stack>
+      {openDialog && (
+        <CreateGroup open={openDialog} handleClose={handleCloseDialog} />
+      )}
     </>
   );
 };
