@@ -15,9 +15,43 @@ import { Gear } from "phosphor-react";
 import { faker } from "@faker-js/faker";
 import useSettings from "../../hooks/useSettings";
 import AntSwitch from "../../components/AntSwitch";
+import { useNavigate } from "react-router-dom";
+
+const getPath = (index) => {
+  switch (index) {
+    case 0:
+      return "/app";
+
+    case 1:
+      return "/group";
+
+    case 2:
+      return "/call";
+
+    case 3:
+      return "/settings";
+
+    default:
+      return "/app";
+  }
+};
+
+const getMenuPath = (index) => {
+  switch (index) {
+    case 0:
+      return "/profile";
+    case 1:
+      return "/settings";
+    case 2:
+      return "/auth/login";
+    default:
+      return "/profile";
+  }
+};
 
 const SideBar = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const { onToggleMode } = useSettings();
   const [selected, setSelected] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -86,6 +120,7 @@ const SideBar = () => {
                 <IconButton
                   onClick={() => {
                     setSelected(el.index);
+                    navigate(getPath(el.index));
                   }}
                   key={el.index}
                   sx={{
@@ -122,6 +157,7 @@ const SideBar = () => {
               <IconButton
                 onClick={() => {
                   setSelected(3);
+                  navigate(getPath(3));
                 }}
                 sx={{
                   width: "max-content",
@@ -168,8 +204,12 @@ const SideBar = () => {
             }}
           >
             <Stack spacing={1} px={1}>
-              {Profile_Menu.map((option) => (
-                <MenuItem onClick={handleClick}>
+              {Profile_Menu.map((option, index) => (
+                <MenuItem
+                  onClick={() => {
+                    handleClick();
+                  }}
+                >
                   <Stack
                     sx={{
                       width: 100,
@@ -177,6 +217,9 @@ const SideBar = () => {
                     direction={"row"}
                     alignItems={"center"}
                     justifyContent={"space-between"}
+                    onClick={() => {
+                      navigate(getMenuPath(index));
+                    }}
                   >
                     <span>{option.title}</span>
                     {option.icon}
