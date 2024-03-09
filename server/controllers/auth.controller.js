@@ -183,3 +183,146 @@ export const verifyOTP = async (req, res) => {
     });
   }
 };
+
+export const protect = async (req, res, next) => {
+  try {
+    let token;
+
+    // 1) Getting token and check if it's there
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies.jwt) {
+      token = req.cookies.jwt;
+    } else {
+      return res.status(401).json({
+        status: "error",
+        message: "You are not logged in! Please log in to get access",
+      });
+    }
+
+    // 2) Verification token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    // 3) Check if user still exists
+    const currentUser = await User.findById(decoded.userId);
+    if (!currentUser) {
+      return res.status(401).json({
+        status: "error",
+        message: "The user belonging to this token does no longer exist",
+      });
+    }
+
+    // 4) Check if user changed password after the token was issued
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return res.status(401).json({
+        status: "error",
+        message: "User recently changed password! Please log in again",
+      });
+    }
+
+    req.user = currentUser;
+    next();
+  } catch (error) {
+    console.log(`Error Occured while protecting the Route: ${error}`);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // 1) Check if email exists
+    if (!email) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email is required",
+      });
+    }
+
+    // 2) Check if user exists
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        status: "error",
+        message: "User does not exist",
+      });
+    }
+
+    // 3) Generate Random Reset Token
+    const resetToken = user.createPasswordResetToken();
+    const resetUrl = `http://localhost:3000/auth/reset-password/?code=${resetToken}`;
+
+    try {
+      return res.status(200).json({
+        status: "success",
+        message: "Reset Password link sent to your email successfully",
+        resetUrl,
+      });
+    } catch (error) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ new: true, validateModifiedOnly: true });
+      console.log(`Error Occured while sending Email: ${error}`);
+      return res.status(500).json({
+        status: "error",
+        message: "Internal Server Error",
+      });
+    }
+  } catch (error) {
+    console.log(`Error Occured while Forgeting your Password: ${error}`);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        status: "error",
+        message: "Token is invalid or has expired",
+      });
+    }
+
+    user.password = req.body.password;
+    user.confirmPassword = req.body.confirmPassword;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    user.passwordChangedAt = Date.now();
+    await user.save({ new: true, validateBeforeSave: true });
+
+    const token = signToken(user._id);
+
+    res.status(200).json({
+      status: "success",
+      message: "Password reset successfully",
+      token,
+    });
+  } catch (error) {
+    console.log(`Error Occured while Resetting your Password: ${error}`);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+    });
+  }
+};
