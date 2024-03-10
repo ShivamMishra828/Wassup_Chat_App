@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 const userSchema = new mongoose.Schema(
   {
@@ -22,9 +23,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
     },
-    confirmPassword: {
-      type: String,
-    },
     passwordChangedAt: {
       type: Date,
     },
@@ -39,7 +37,7 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     otp: {
-      type: Number,
+      type: String,
     },
     otpExpires: {
       type: Date,
@@ -49,15 +47,22 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("otp")) return next();
-  this.otp = await bcrypt.hash(this.otp, 12);
+  if (!this.isModified("otp") || !this.otp) return next();
+  this.otp = await bcrypt.hash(this.otp.toString(), 12);
+  console.log(`FROM PRE SAVE HOOK:- ${this.otp.toString()}`);
   next();
 });
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password") || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 12);
-  this.confirmPassword = undefined;
+  next();
+});
+
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew || !this.password)
+    return next();
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 

@@ -1,9 +1,15 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import otpGenerator from "otp-generator";
+import sendMail from "../services/mailer.js";
+import { otpVerification } from "../templates/mail/otpVerificationTemplate.js";
+import dotenv from "dotenv";
+import crypto from "crypto";
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+dotenv.config();
+
+const signToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "3d",
   });
 };
@@ -68,15 +74,16 @@ export const register = async (req, res, next) => {
         message: "User already exists",
       });
     } else if (existingUser && !existingUser.verified) {
-      await User.findOneAndUpdate(
-        { email },
-        { firstName, lastName, password },
-        { new: true }
-      );
+      existingUser.firstName = firstName;
+      existingUser.lastName = lastName;
+      existingUser.password = password;
+      existingUser.verified = false;
+      await existingUser.save({ validateBeforeSave: true });
 
       req.userId = existingUser._id;
       next();
     } else {
+      // 3) Create a new user
       const newUser = await User.create({
         firstName,
         lastName,
@@ -110,11 +117,19 @@ export const sendOTP = async (req, res, next) => {
     const otpExpires = Date.now() + 5 * 60 * 1000;
 
     // 2) Save OTP and OTP Expires in the database
-    await User.findByIdAndUpdate(
-      userId,
-      { otp: generatedOTP, otpExpires },
-      { new: true }
-    );
+    const user = await User.findById(userId);
+
+    user.otp = generatedOTP;
+    user.otpExpires = otpExpires;
+    await user.save({ validateBeforeSave: true });
+
+    // 3) Send OTP to the user
+    await sendMail({
+      to: user.email,
+      from: process.env.MAIL_USERNAME,
+      subject: "OTP for Verification",
+      html: otpVerification(user.firstName, generatedOTP),
+    });
 
     return res.status(200).json({
       status: "success",
@@ -148,6 +163,13 @@ export const verifyOTP = async (req, res) => {
       return res.status(400).json({
         status: "error",
         message: "Invalid email or OTP Expired",
+      });
+    }
+
+    if (user.verified) {
+      return res.status(400).json({
+        status: "error",
+        message: "User already verified",
       });
     }
 
@@ -257,10 +279,12 @@ export const forgotPassword = async (req, res, next) => {
     }
 
     // 3) Generate Random Reset Token
-    const resetToken = user.createPasswordResetToken();
-    const resetUrl = `http://localhost:3000/auth/reset-password/?code=${resetToken}`;
+    const resetToken = await user.createPasswordResetToken();
+    await user.save({ validateModifiedOnly: true });
 
     try {
+      const resetUrl = `http://localhost:3000/auth/reset-password/?code=${resetToken}`;
+      console.log(resetToken);
       return res.status(200).json({
         status: "success",
         message: "Reset Password link sent to your email successfully",
@@ -269,7 +293,7 @@ export const forgotPassword = async (req, res, next) => {
     } catch (error) {
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
-      await user.save({ new: true, validateModifiedOnly: true });
+      await user.save({ validateModifiedOnly: true });
       console.log(`Error Occured while sending Email: ${error}`);
       return res.status(500).json({
         status: "error",
@@ -289,7 +313,7 @@ export const resetPassword = async (req, res) => {
   try {
     const hashedToken = crypto
       .createHash("sha256")
-      .update(req.params.token)
+      .update(req.body.token)
       .digest("hex");
 
     const user = await User.findOne({

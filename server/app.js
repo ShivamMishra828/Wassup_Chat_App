@@ -3,6 +3,7 @@ import morgan from "morgan";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
 import cors from "cors";
+import router from "./routes/index.route.js";
 
 const app = express();
 
@@ -24,5 +25,8 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })
 );
+
+// Routes
+app.use("/api/v1", router);
 
 export default app;
