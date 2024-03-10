@@ -14,9 +14,12 @@ import {
 import { RHFTextField } from "../../components/hook-form";
 import { Eye, EyeSlash } from "phosphor-react";
 import { Link as RouterLink } from "react-router-dom";
+import { LoginUser } from "../../redux/slices/auth";
+import { useDispatch } from "react-redux";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch();
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
       .required("Email is required")
@@ -24,8 +27,8 @@ const LoginForm = () => {
     password: Yup.string().required("Password is required"),
   });
   const defaultValues = {
-    email: "demo@wassup.com",
-    password: "demo123",
+    email: "",
+    password: "",
   };
   const methods = useForm({
     resolver: yupResolver(LoginSchema),
@@ -43,6 +46,8 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     try {
+      dispatch(LoginUser(data));
+      console.log(data);
     } catch (error) {
       console.log(error);
       reset();
