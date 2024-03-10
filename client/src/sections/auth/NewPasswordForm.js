@@ -12,19 +12,24 @@ import {
 } from "@mui/material";
 import { RHFTextField } from "../../components/hook-form";
 import { Eye, EyeSlash } from "phosphor-react";
+import { useDispatch } from "react-redux";
+import { NewPassword } from "../../redux/slices/auth";
+import { useSearchParams } from "react-router-dom";
 
 const NewPasswordForm = () => {
+  const dispatch = useDispatch();
+  const [queryParameters] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const NewPasswordSchema = Yup.object().shape({
-    newPassword: Yup.string()
+    password: Yup.string()
       .min(6, "Password must be atleast 6 characters")
       .required("New Password is required"),
     confirmPassword: Yup.string()
       .required("Confirm Password is required")
-      .oneOf([Yup.ref("newPassword"), null], "Passwords must match"),
+      .oneOf([Yup.ref("password"), null], "Passwords must match"),
   });
   const defaultValues = {
-    newPassword: "",
+    password: "",
     confirmPassword: "",
   };
   const methods = useForm({
@@ -43,6 +48,7 @@ const NewPasswordForm = () => {
 
   const onSubmit = async (data) => {
     try {
+      dispatch(NewPassword({ ...data, token: queryParameters.get("token") }));
     } catch (error) {
       console.log(error);
       reset();
@@ -60,7 +66,7 @@ const NewPasswordForm = () => {
         )}
 
         <RHFTextField
-          name="newPassword"
+          name="password"
           label="New Password"
           type={showPassword ? "text" : "password"}
           InputProps={{

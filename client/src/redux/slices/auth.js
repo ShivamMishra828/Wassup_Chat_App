@@ -24,12 +24,63 @@ const slice = createSlice({
 
 export default slice.reducer;
 
-export function LoginUser(formValue) {
+export function LoginUser(formValues) {
   return async (dispatch, getState) => {
     await axios
       .post(
-        "api/v1/auth/login",
-        { ...formValue },
+        "/api/v1/auth/login",
+        { ...formValues },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        dispatch(
+          slice.actions.login({
+            isLoggedIn: true,
+            token: response.data.token,
+          })
+        );
+      })
+      .catch((err) => {
+        console.log(`Error: ${err}`);
+      });
+  };
+}
+
+export function LogoutUser() {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.logout());
+  };
+}
+
+export function ForgotPassword(formValues) {
+  return async (dispatch, getState) => {
+    await axios
+      .post(
+        "/api/v1/auth/forgot-password",
+        { ...formValues },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {})
+      .catch((err) => {
+        console.log(`Error: ${err}`);
+      });
+  };
+}
+
+export function NewPassword(formValues) {
+  return async (dispatch, getState) => {
+    await axios
+      .post(
+        "/api/v1/auth/reset-password",
+        { ...formValues },
         {
           headers: {
             "Content-Type": "application/json",

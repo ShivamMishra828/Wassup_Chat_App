@@ -5,6 +5,7 @@ import sendMail from "../services/mailer.js";
 import { otpVerification } from "../templates/mail/otpVerificationTemplate.js";
 import dotenv from "dotenv";
 import crypto from "crypto";
+import { resetPasswordMailTemplate } from "../templates/mail/resetPasswordTemplate.js";
 
 dotenv.config();
 
@@ -283,8 +284,14 @@ export const forgotPassword = async (req, res, next) => {
     await user.save({ validateModifiedOnly: true });
 
     try {
-      const resetUrl = `http://localhost:3000/auth/reset-password/?code=${resetToken}`;
-      console.log(resetToken);
+      const resetUrl = `http://localhost:3000/auth/new-password/?token=${resetToken}`;
+
+      await sendMail({
+        to: user.email,
+        from: process.env.MAIL_USERNAME,
+        subject: "Reset Password Link",
+        html: resetPasswordMailTemplate(user.firstName, resetUrl),
+      });
       return res.status(200).json({
         status: "success",
         message: "Reset Password link sent to your email successfully",
@@ -333,7 +340,7 @@ export const resetPassword = async (req, res) => {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     user.passwordChangedAt = Date.now();
-    await user.save({ new: true, validateBeforeSave: true });
+    await user.save({ validateBeforeSave: true });
 
     const token = signToken(user._id);
 
