@@ -76,6 +76,12 @@ export function LoginUser(formValues) {
 export function LogoutUser() {
   return async (dispatch, getState) => {
     dispatch(slice.actions.logout());
+    dispatch(
+      OpenSnackbar({
+        message: "You have been logged out",
+        severity: "success",
+      })
+    );
   };
 }
 
@@ -91,9 +97,19 @@ export function ForgotPassword(formValues) {
           },
         }
       )
-      .then((response) => {})
+      .then((response) => {
+        dispatch(
+          OpenSnackbar({ message: response.data.message, severity: "success" })
+        );
+      })
       .catch((err) => {
         console.log(`Error: ${err}`);
+        dispatch(
+          OpenSnackbar({
+            message: err.response.data.message,
+            severity: "error",
+          })
+        );
       });
   };
 }
@@ -113,6 +129,9 @@ export function NewPassword(formValues) {
       .then((response) => {
         console.log(`Response: ${response}`);
         dispatch(
+          OpenSnackbar({ message: response.data.message, severity: "success" })
+        );
+        dispatch(
           slice.actions.login({
             isLoggedIn: true,
             token: response.data.token,
@@ -121,6 +140,12 @@ export function NewPassword(formValues) {
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
+        dispatch(
+          OpenSnackbar({
+            message: err.response.data.message,
+            severity: "error",
+          })
+        );
       });
   };
 }
@@ -155,6 +180,9 @@ export function RegisterUser(formValues) {
             error: false,
           })
         );
+        dispatch(
+          OpenSnackbar({ message: response.data.message, severity: "success" })
+        );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
@@ -162,6 +190,12 @@ export function RegisterUser(formValues) {
           slice.actions.updateIsLoading({
             isLoading: false,
             error: true,
+          })
+        );
+        dispatch(
+          OpenSnackbar({
+            message: err.response.data.message,
+            severity: "error",
           })
         );
       })
@@ -192,9 +226,18 @@ export function VerifyUser(formValues) {
             token: response.data.token,
           })
         );
+        dispatch(
+          OpenSnackbar({ message: response.data.message, severity: "success" })
+        );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
+        dispatch(
+          OpenSnackbar({
+            message: err.response.data.message,
+            severity: "error",
+          })
+        );
       });
   };
 }
