@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "../../utils/axios";
-import { OpenSnackbar } from "./app";
+import toast from "react-hot-toast";
 
 const initialState = {
   isLoggedIn: false,
@@ -55,18 +55,16 @@ export function LoginUser(formValues) {
         );
 
         dispatch(
-          OpenSnackbar({
-            message: response.data.message,
-            severity: "success",
+          toast.success(response.data.message, {
+            duration: 4000,
           })
         );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
         dispatch(
-          OpenSnackbar({
-            message: err.response.data.message,
-            severity: "error",
+          toast.error(err.response.data.message, {
+            duration: 4000,
           })
         );
       });
@@ -77,9 +75,8 @@ export function LogoutUser() {
   return async (dispatch, getState) => {
     dispatch(slice.actions.logout());
     dispatch(
-      OpenSnackbar({
-        message: "You have been logged out",
-        severity: "success",
+      toast.success("Logged out successfully", {
+        duration: 4000,
       })
     );
   };
@@ -99,15 +96,16 @@ export function ForgotPassword(formValues) {
       )
       .then((response) => {
         dispatch(
-          OpenSnackbar({ message: response.data.message, severity: "success" })
+          toast.success(response.data.message, {
+            duration: 4000,
+          })
         );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
         dispatch(
-          OpenSnackbar({
-            message: err.response.data.message,
-            severity: "error",
+          toast.error(err.response.data.message, {
+            duration: 4000,
           })
         );
       });
@@ -129,21 +127,22 @@ export function NewPassword(formValues) {
       .then((response) => {
         console.log(`Response: ${response}`);
         dispatch(
-          OpenSnackbar({ message: response.data.message, severity: "success" })
-        );
-        dispatch(
           slice.actions.login({
             isLoggedIn: true,
             token: response.data.token,
+          })
+        );
+        dispatch(
+          toast.success(response.data.message, {
+            duration: 4000,
           })
         );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
         dispatch(
-          OpenSnackbar({
-            message: err.response.data.message,
-            severity: "error",
+          toast.error(err.response.data.message, {
+            duration: 4000,
           })
         );
       });
@@ -174,15 +173,6 @@ export function RegisterUser(formValues) {
             email: formValues.email,
           })
         );
-        dispatch(
-          slice.actions.updateIsLoading({
-            isLoading: false,
-            error: false,
-          })
-        );
-        dispatch(
-          OpenSnackbar({ message: response.data.message, severity: "success" })
-        );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
@@ -193,15 +183,23 @@ export function RegisterUser(formValues) {
           })
         );
         dispatch(
-          OpenSnackbar({
-            message: err.response.data.message,
-            severity: "error",
+          toast.error(err.response.data.message, {
+            duration: 4000,
           })
         );
       })
       .finally(() => {
+        dispatch(
+          slice.actions.updateIsLoading({
+            isLoading: false,
+            error: false,
+          })
+        );
         if (!getState().auth.error) {
           window.location.href = "/auth/verify";
+          dispatch(toast.success("OTP Sent"), {
+            duration: 4000,
+          });
         }
       });
   };
@@ -227,15 +225,16 @@ export function VerifyUser(formValues) {
           })
         );
         dispatch(
-          OpenSnackbar({ message: response.data.message, severity: "success" })
+          toast.success(response.data.message, {
+            duration: 4000,
+          })
         );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
         dispatch(
-          OpenSnackbar({
-            message: err.response.data.message,
-            severity: "error",
+          toast.error(err.response.data.message, {
+            duration: 4000,
           })
         );
       });
