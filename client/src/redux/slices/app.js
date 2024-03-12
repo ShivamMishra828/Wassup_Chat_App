@@ -1,15 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const initialState = {
   sidebar: {
     open: false,
     type: "CONTACT",
   },
-  snackbar: {
-    open: null,
-    message: null,
-    severity: null,
-  },
+  users: [],
+  friends: [],
+  friendRequests: [],
 };
 
 const slice = createSlice({
@@ -22,15 +21,14 @@ const slice = createSlice({
     updateSidebarType(state, action) {
       state.sidebar.type = action.payload.type;
     },
-    openSnackbar(state, action) {
-      state.snackbar.open = true;
-      state.snackbar.message = action.payload.message;
-      state.snackbar.severity = action.payload.severity;
+    updateUsers(state, action) {
+      state.users = action.payload.users;
     },
-    closeSnackbar(state, action) {
-      state.snackbar.open = false;
-      state.snackbar.message = null;
-      state.snackbar.severity = null;
+    updateFriends(state, action) {
+      state.friends = action.payload.friends;
+    },
+    updateFriendRequest(state, action) {
+      state.friendRequests = action.payload.requests;
     },
   },
 });
@@ -49,18 +47,58 @@ export function UpdateSidebarType(type) {
   };
 }
 
-export function OpenSnackbar({ message, severity }) {
+export const FetchUsers = () => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.openSnackbar({ message, severity }));
-
-    setTimeout(() => {
-      dispatch(slice.actions.closeSnackbar());
-    }, 4000);
+    await axios
+      .get("/api/v1/users/get-users", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getState().auth.token}`,
+        },
+      })
+      .then((res) => {
+        dispatch(slice.actions.updateUsers({ users: res.data.data }));
+      })
+      .catch((error) => {
+        console.log(`Error Occured while fetching users: ${error}`);
+      });
   };
-}
+};
 
-export function CloseSnackbar() {
+export const FetchFriends = () => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.closeSnackbar());
+    await axios
+      .get("/api/v1/users/get-friends", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getState().auth.token}`,
+        },
+      })
+      .then((res) => {
+        dispatch(slice.actions.updateFriends({ friends: res.data.data }));
+      })
+      .catch((error) => {
+        console.log(`Error Occured while fetching friends: ${error}`);
+      });
   };
-}
+};
+
+export const FetchFriendRequests = () => {
+  return async (dispatch, getState) => {
+    await axios
+      .get("/api/v1/users/get-friends-requests", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getState().auth.token}`,
+        },
+      })
+      .then((res) => {
+        dispatch(
+          slice.actions.updateFriendRequest({ requests: res.data.data })
+        );
+      })
+      .catch((error) => {
+        console.log(`Error Occured while fetching friend requests: ${error}`);
+      });
+  };
+};

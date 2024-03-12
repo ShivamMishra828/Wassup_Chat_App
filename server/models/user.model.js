@@ -42,6 +42,15 @@ const userSchema = new mongoose.Schema(
     otpExpires: {
       type: Date,
     },
+    friends: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    socket_id: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
