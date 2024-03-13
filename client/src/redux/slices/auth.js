@@ -171,7 +171,9 @@ export function RegisterUser(formValues) {
         dispatch(
           slice.actions.updateRegisterEmail({
             email: formValues.email,
-          })
+          }),
+
+          toast.success(response.data.message)
         );
       })
       .catch((err) => {
@@ -189,17 +191,8 @@ export function RegisterUser(formValues) {
         );
       })
       .finally(() => {
-        dispatch(
-          slice.actions.updateIsLoading({
-            isLoading: false,
-            error: false,
-          })
-        );
         if (!getState().auth.error) {
           window.location.href = "/auth/verify";
-          dispatch(toast.success("OTP Sent"), {
-            duration: 4000,
-          });
         }
       });
   };
