@@ -16,12 +16,8 @@ const UsersList = () => {
   const { users } = useSelector((state) => state.app);
   return (
     <>
-      {users.map((user, index) => {
-        return (
-          <div key={user._id}>
-            <p>{user.firstName}</p>
-          </div>
-        );
+      {users.map((el, index) => {
+        return <></>;
       })}
     </>
   );
@@ -37,18 +33,14 @@ const FriendsList = () => {
 
   return (
     <>
-      {friends.map((friend, index) => {
-        return (
-          <div key={friend._id}>
-            <p>{friend.firstName}</p>
-          </div>
-        );
+      {friends.map((el, index) => {
+        return <></>;
       })}
     </>
   );
 };
 
-const FriendRequestsList = () => {
+const FriendRequestList = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(FetchFriendRequests());
@@ -58,12 +50,8 @@ const FriendRequestsList = () => {
 
   return (
     <>
-      {friendRequests.map((request, index) => {
-        return (
-          <div key={request._id}>
-            <p>{request.sender.firstName}</p>
-          </div>
-        );
+      {friendRequests.map((el, index) => {
+        return <></>;
       })}
     </>
   );
@@ -111,7 +99,7 @@ const Friends = ({ open, handleClose }) => {
                 case 1:
                   return <FriendsList />;
                 case 2:
-                  return <FriendRequestsList />;
+                  return <FriendRequestList />;
                 default:
                   break;
               }

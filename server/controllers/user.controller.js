@@ -38,22 +38,22 @@ export const updateMe = async (req, res) => {
   }
 };
 
-export const getUsers = async (req, res) => {
+export const getUsers = async (req, res, next) => {
   try {
-    const allUsers = await User.find({
+    const all_users = await User.find({
       verified: true,
     }).select("firstName lastName _id");
 
-    const thisUser = req.user;
-    const remainingUsers = allUsers.filter(
+    const this_user = req.user;
+    const remaining_users = all_users.filter(
       (user) =>
-        !thisUser.friends.includes(user._id) &&
-        user._id.toString() !== thisUser._id.toString()
+        !this_user.friends.includes(user._id) &&
+        user._id.toString() !== req.user._id.toString()
     );
 
     return res.status(200).json({
       status: "success",
-      data: remainingUsers,
+      data: remaining_users,
       message: "Users fetched Successfully",
     });
   } catch (error) {
@@ -65,7 +65,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
-export const getRequests = async (req, res) => {
+export const getRequests = async (req, res, next) => {
   try {
     const requests = await FriendRequest.find({
       recipient: req.user._id,
@@ -85,7 +85,7 @@ export const getRequests = async (req, res) => {
   }
 };
 
-export const getFriends = async (req, res) => {
+export const getFriends = async (req, res, next) => {
   try {
     const friends = await User.findById(req.user._id).populate(
       "friends",

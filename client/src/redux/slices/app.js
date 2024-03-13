@@ -27,8 +27,8 @@ const slice = createSlice({
     updateFriends(state, action) {
       state.friends = action.payload.friends;
     },
-    updateFriendRequest(state, action) {
-      state.friendRequests = action.payload.requests;
+    updateFriendRequests(state, action) {
+      state.friendRequests = action.payload.request;
     },
   },
 });
@@ -50,7 +50,7 @@ export function UpdateSidebarType(type) {
 export const FetchUsers = () => {
   return async (dispatch, getState) => {
     await axios
-      .get("/api/v1/users/get-users", {
+      .get("/api/v1/user/get-users", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getState().auth.token}`,
@@ -68,7 +68,7 @@ export const FetchUsers = () => {
 export const FetchFriends = () => {
   return async (dispatch, getState) => {
     await axios
-      .get("/api/v1/users/get-friends", {
+      .get("/api/v1/user/get-friends", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getState().auth.token}`,
@@ -86,7 +86,7 @@ export const FetchFriends = () => {
 export const FetchFriendRequests = () => {
   return async (dispatch, getState) => {
     await axios
-      .get("/api/v1/users/get-friends-requests", {
+      .get("/api/v1/user/get-friend-requests", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getState().auth.token}`,
@@ -94,7 +94,7 @@ export const FetchFriendRequests = () => {
       })
       .then((res) => {
         dispatch(
-          slice.actions.updateFriendRequest({ requests: res.data.data })
+          slice.actions.updateFriendRequests({ request: res.data.data })
         );
       })
       .catch((error) => {

@@ -12,6 +12,6 @@ const router = express.Router();
 router.patch("/update-me", protect, updateMe);
 router.get("/get-users", protect, getUsers);
 router.get("/get-friends", protect, getFriends);
-router.get("/get-friends-requests", protect, getRequests);
+router.get("/get-friend-requests", protect, getRequests);
 
 export default router;
