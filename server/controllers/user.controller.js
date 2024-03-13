@@ -87,14 +87,14 @@ export const getRequests = async (req, res, next) => {
 
 export const getFriends = async (req, res, next) => {
   try {
-    const friends = await User.findById(req.user._id).populate(
+    const this_user = await User.findById(req.user._id).populate(
       "friends",
       "firstName lastName _id"
     );
 
     return res.status(200).json({
       status: "success",
-      data: friends,
+      data: this_user.friends,
       message: "Friends fetched Successfully",
     });
   } catch (error) {

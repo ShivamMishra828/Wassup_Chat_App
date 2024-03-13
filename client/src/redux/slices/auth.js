@@ -54,6 +54,8 @@ export function LoginUser(formValues) {
           })
         );
 
+        window.localStorage.setItem("user_id", response.data.user_id);
+
         dispatch(
           toast.success(response.data.message, {
             duration: 4000,
@@ -73,6 +75,7 @@ export function LoginUser(formValues) {
 
 export function LogoutUser() {
   return async (dispatch, getState) => {
+    window.localStorage.removeItem("user_id");
     dispatch(slice.actions.logout());
     dispatch(
       toast.success("Logged out successfully", {
@@ -217,6 +220,9 @@ export function VerifyUser(formValues) {
             token: response.data.token,
           })
         );
+
+        window.localStorage.setItem("user_id", response.data.user_id);
+
         dispatch(
           toast.success(response.data.message, {
             duration: 4000,

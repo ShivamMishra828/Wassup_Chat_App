@@ -44,6 +44,7 @@ export const login = async (req, res) => {
       status: "success",
       message: "Logged in successfully",
       token,
+      user_id: user._id,
     });
   } catch (error) {
     console.log(`Error Occured while logging in the User: ${error}`);
@@ -197,6 +198,7 @@ export const verifyOTP = async (req, res) => {
       status: "success",
       message: "User verified successfully",
       token,
+      user_id: user._id,
     });
   } catch (error) {
     console.log(`Error Occured while verifying OTP: ${error}`);
