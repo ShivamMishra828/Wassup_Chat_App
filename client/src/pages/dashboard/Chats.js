@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -14,7 +14,6 @@ import {
   Users,
 } from "phosphor-react";
 import { useTheme } from "@mui/material/styles";
-import { ChatList } from "../../data";
 import { SimpleBarStyle } from "../../components/Scrollbar";
 import ChatElement from "../../components/ChatElement";
 import {
@@ -23,9 +22,19 @@ import {
   SearchInputBase,
 } from "../../components/Search";
 import Friends from "../../sections/main/Friends";
+import { socket } from "../../socket";
+import { useDispatch, useSelector } from "react-redux";
+import { FetchDirectConversations } from "../../redux/slices/conversation";
+
+const user_id = window.localStorage.getItem("user_id");
 
 const Chats = () => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const conversationsData = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+  const { conversations } = conversationsData || {};
   const [openDialog, setOpenDialog] = useState(false);
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -33,6 +42,12 @@ const Chats = () => {
   const handleOpenDialog = () => {
     setOpenDialog(true);
   };
+
+  useEffect(() => {
+    socket.emit("get_direct_conversations", { user_id }, (data) => {
+      dispatch(FetchDirectConversations({ conversations: data }));
+    });
+  }, []);
   return (
     <>
       <Box
@@ -64,10 +79,17 @@ const Chats = () => {
                 onClick={() => {
                   handleOpenDialog();
                 }}
+                sx={{
+                  width: "max-content",
+                }}
               >
                 <Users />
               </IconButton>
-              <IconButton>
+              <IconButton
+                sx={{
+                  width: "max-content",
+                }}
+              >
                 <CircleDashed />
               </IconButton>
             </Stack>
@@ -77,7 +99,12 @@ const Chats = () => {
               <SearchIconWrapper>
                 <MagnifyingGlass color="#709ce6" />
               </SearchIconWrapper>
-              <SearchInputBase placeholder="Search" />
+              <SearchInputBase
+                placeholder="Search"
+                inputProps={{
+                  "aria-label": "search",
+                }}
+              />
             </Search>
           </Stack>
           <Stack spacing={1}>
@@ -97,7 +124,7 @@ const Chats = () => {
             }}
           >
             <SimpleBarStyle timeout={500} clickOnTrack="false">
-              <Stack spacing={2.4}>
+              {/* <Stack spacing={2.4}>
                 <Typography
                   variant="subtitle2"
                   sx={{
@@ -109,7 +136,7 @@ const Chats = () => {
                 {ChatList.filter((item) => item.pinned).map((item) => (
                   <ChatElement key={item.id} {...item} />
                 ))}
-              </Stack>
+              </Stack> */}
               <Stack spacing={2.4}>
                 <Typography
                   variant="subtitle2"
@@ -120,9 +147,11 @@ const Chats = () => {
                 >
                   All Chats
                 </Typography>
-                {ChatList.filter((item) => !item.pinned).map((item) => (
-                  <ChatElement key={item.id} {...item} />
-                ))}
+                {conversations
+                  .filter((item) => !item.pinned)
+                  .map((item) => (
+                    <ChatElement key={item.id} {...item} />
+                  ))}
               </Stack>
             </SimpleBarStyle>
           </Stack>

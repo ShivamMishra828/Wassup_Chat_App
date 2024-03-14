@@ -6,6 +6,8 @@ const initialState = {
   isLoggedIn: false,
   token: "",
   isLoading: false,
+  user: null,
+  user_id: null,
   email: "",
   error: false,
 };
@@ -36,6 +38,7 @@ export default slice.reducer;
 
 export function LoginUser(formValues) {
   return async (dispatch, getState) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     await axios
       .post(
         "/api/v1/auth/login",
@@ -51,6 +54,7 @@ export function LoginUser(formValues) {
           slice.actions.login({
             isLoggedIn: true,
             token: response.data.token,
+            user_id: response.data.user_id,
           })
         );
 
@@ -61,6 +65,10 @@ export function LoginUser(formValues) {
             duration: 4000,
           })
         );
+
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: false })
+        );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
@@ -68,6 +76,9 @@ export function LoginUser(formValues) {
           toast.error(err.response.data.message, {
             duration: 4000,
           })
+        );
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: true })
         );
       });
   };
@@ -87,6 +98,7 @@ export function LogoutUser() {
 
 export function ForgotPassword(formValues) {
   return async (dispatch, getState) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     await axios
       .post(
         "/api/v1/auth/forgot-password",
@@ -103,6 +115,9 @@ export function ForgotPassword(formValues) {
             duration: 4000,
           })
         );
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: false })
+        );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
@@ -111,12 +126,16 @@ export function ForgotPassword(formValues) {
             duration: 4000,
           })
         );
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: true })
+        );
       });
   };
 }
 
 export function NewPassword(formValues) {
   return async (dispatch, getState) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     await axios
       .post(
         "/api/v1/auth/reset-password",
@@ -140,6 +159,9 @@ export function NewPassword(formValues) {
             duration: 4000,
           })
         );
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: false })
+        );
       })
       .catch((err) => {
         console.log(`Error: ${err}`);
@@ -148,18 +170,17 @@ export function NewPassword(formValues) {
             duration: 4000,
           })
         );
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: true })
+        );
       });
   };
 }
 
 export function RegisterUser(formValues) {
   return async (dispatch, getState) => {
-    dispatch(
-      slice.actions.updateIsLoading({
-        isLoading: true,
-        error: false,
-      })
-    );
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+
     await axios
       .post(
         "/api/v1/auth/register",
@@ -175,8 +196,14 @@ export function RegisterUser(formValues) {
           slice.actions.updateRegisterEmail({
             email: formValues.email,
           }),
-
           toast.success(response.data.message)
+        );
+
+        dispatch(
+          slice.actions.updateIsLoading({
+            isLoading: false,
+            error: false,
+          })
         );
       })
       .catch((err) => {
@@ -203,6 +230,7 @@ export function RegisterUser(formValues) {
 
 export function VerifyUser(formValues) {
   return async (dispatch, getState) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     await axios
       .post(
         "/api/v1/auth/verify",
@@ -214,6 +242,8 @@ export function VerifyUser(formValues) {
         }
       )
       .then((response) => {
+        dispatch(slice.actions.updateRegisterEmail({ email: "" }));
+        window.localStorage.setItem("user_id", response.data.user_id);
         dispatch(
           slice.actions.login({
             isLoggedIn: true,
@@ -221,12 +251,14 @@ export function VerifyUser(formValues) {
           })
         );
 
-        window.localStorage.setItem("user_id", response.data.user_id);
-
         dispatch(
           toast.success(response.data.message, {
             duration: 4000,
           })
+        );
+
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: false })
         );
       })
       .catch((err) => {
@@ -235,6 +267,9 @@ export function VerifyUser(formValues) {
           toast.error(err.response.data.message, {
             duration: 4000,
           })
+        );
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: true })
         );
       });
   };

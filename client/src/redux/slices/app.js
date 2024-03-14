@@ -1,11 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios from "../../utils/axios";
 
 const initialState = {
   sidebar: {
     open: false,
     type: "CONTACT",
   },
+  isLoggedIn: true,
+  tab: 0,
   users: [],
   friends: [],
   friendRequests: [],
@@ -22,6 +24,9 @@ const slice = createSlice({
     },
     updateSidebarType(state, action) {
       state.sidebar.type = action.payload.type;
+    },
+    updateTab(state, action) {
+      state.tab = action.payload.tab;
     },
     updateUsers(state, action) {
       state.users = action.payload.users;
@@ -50,6 +55,12 @@ export function ToggleSidebar() {
 export function UpdateSidebarType(type) {
   return async (dispatch, getState) => {
     dispatch(slice.actions.updateSidebarType({ type }));
+  };
+}
+
+export function UpdateTab(tab) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.updateTab({ tab }));
   };
 }
 
@@ -111,6 +122,6 @@ export const FetchFriendRequests = () => {
 
 export const SelectConversation = ({ room_id }) => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.selectConversation(room_id));
+    dispatch(slice.actions.selectConversation({ room_id }));
   };
 };

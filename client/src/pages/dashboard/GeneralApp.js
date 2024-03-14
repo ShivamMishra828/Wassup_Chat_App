@@ -8,8 +8,10 @@ import { useSelector } from "react-redux";
 import SharedMessages from "../../sections/SharedMessages";
 import StarredMessages from "../../sections/StarredMessages";
 import NoChatSVG from "../../assets/Illustration/NoChat";
+import { useSearchParams } from "react-router-dom";
 
 const GeneralApp = () => {
+  const [searchParams] = useSearchParams();
   const theme = useTheme();
   const { sidebar, chat_type, room_id } = useSelector((store) => store.app);
   return (
@@ -28,9 +30,15 @@ const GeneralApp = () => {
             theme.palette.mode === "light"
               ? "#f0f4fa"
               : theme.palette.background.paper,
+
+          borderBottom:
+            searchParams.get("type") === "individual-chat" &&
+            searchParams.get("id")
+              ? "0px"
+              : "6px solid #0162C4",
         }}
       >
-        {room_id !== null && chat_type === "individual" ? (
+        {chat_type === "individual" && room_id !== null ? (
           <Conversation />
         ) : (
           <Stack

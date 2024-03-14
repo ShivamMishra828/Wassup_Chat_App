@@ -6,6 +6,8 @@ import { Server } from "socket.io";
 import User from "./models/user.model.js";
 import FriendRequest from "./models/friendRequest.model.js";
 import path from "path";
+import OneToOneMessage from "./models/oneToOneMessage.model.js";
+import { on } from "events";
 
 dotenv.config();
 
@@ -80,6 +82,36 @@ io.on("connection", async (socket) => {
     io.to(receiver.socket_id).emit("request_accepted", {
       message: "Friend request accepted",
     });
+  });
+
+  socket.on("get_direct_conversations", async ({ user_id }, callback) => {
+    const existing_conversations = await OneToOneMessage.find({
+      participants: { $all: [user_id] },
+    }).populate("participants", "firstName lastName _id email status");
+
+    callback(existing_conversations);
+  });
+
+  socket.on("start_conversation", async (data) => {
+    const { to, from } = data;
+    const existing_conversation = await OneToOneMessage.findOne({
+      participants: { $size: 2, $all: [to, from] },
+    }).populate("participants", "firstName lastName _id email status");
+
+    if (existing_conversation.length === 0) {
+      let new_chat = await OneToOneMessage.create({
+        participants: [to, from],
+      });
+
+      new_chat = await OneToOneMessage.findById(new_chat._id).populate(
+        "participants",
+        "firstName lastName _id email status"
+      );
+
+      socket.emit("start_chat", new_chat);
+    } else {
+      socket.emit("open_chat", existing_conversation[0]);
+    }
   });
 
   socket.on("text_message", async (data) => {});

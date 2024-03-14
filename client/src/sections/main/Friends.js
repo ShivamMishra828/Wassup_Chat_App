@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, Stack, Tab, Tabs } from "@mui/material";
+import { Dialog, DialogContent, Slide, Stack, Tab, Tabs } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -12,17 +12,21 @@ import {
   UserComponent,
 } from "../../components/Friends";
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const UsersList = () => {
   const dispatch = useDispatch();
+  const { users } = useSelector((state) => state.app);
   useEffect(() => {
     dispatch(FetchUsers());
-  }, [dispatch]);
+  }, []);
 
-  const { users } = useSelector((state) => state.app);
   return (
     <>
       {users.map((el, index) => {
-        return <UserComponent key={el._id} {...el} />;
+        return <UserComponent key={index} {...el} />;
       })}
     </>
   );
@@ -30,16 +34,15 @@ const UsersList = () => {
 
 const FriendsList = () => {
   const dispatch = useDispatch();
+  const { friends } = useSelector((state) => state.app);
   useEffect(() => {
     dispatch(FetchFriends());
-  }, [dispatch]);
-
-  const { friends } = useSelector((state) => state.app);
+  }, []);
 
   return (
     <>
       {friends.map((el, index) => {
-        return <FriendComponent key={el._id} {...el} />;
+        return <FriendComponent key={index} {...el} />;
       })}
     </>
   );
@@ -47,17 +50,16 @@ const FriendsList = () => {
 
 const FriendRequestList = () => {
   const dispatch = useDispatch();
+  const { friendRequests } = useSelector((state) => state.app);
   useEffect(() => {
     dispatch(FetchFriendRequests());
-  }, [dispatch]);
-
-  const { friendRequests } = useSelector((state) => state.app);
+  }, []);
 
   return (
     <>
       {friendRequests.map((el, index) => {
         return (
-          <FriendRequestComponent key={el._id} {...el.sender} id={el._id} />
+          <FriendRequestComponent key={index} {...el.sender} id={el._id} />
         );
       })}
     </>
@@ -76,6 +78,8 @@ const Friends = ({ open, handleClose }) => {
       open={open}
       keepMounted
       onClose={handleClose}
+      TransitionComponent={Transition}
+      aria-describedby="alert-dialog-slide-description"
       sx={{
         p: 4,
       }}

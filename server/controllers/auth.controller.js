@@ -6,6 +6,7 @@ import { otpVerification } from "../templates/mail/otpVerificationTemplate.js";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import { resetPasswordMailTemplate } from "../templates/mail/resetPasswordTemplate.js";
+import { promisify } from "util";
 
 dotenv.config();
 
@@ -30,7 +31,14 @@ export const login = async (req, res) => {
     // 2) Check if user exists && password is correct
     const user = await User.findOne({ email }).select("+password");
 
-    if (!user || !(await user.isPasswordCorrect(password, user.password))) {
+    if (!user) {
+      return res.status(401).json({
+        status: "error",
+        message: "User does not exist",
+      });
+    }
+
+    if (!(await user.isPasswordCorrect(password, user.password))) {
       return res.status(401).json({
         status: "error",
         message: "Invalid email or password",

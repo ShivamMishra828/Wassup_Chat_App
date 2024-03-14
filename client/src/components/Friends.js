@@ -18,10 +18,11 @@ const StyledChatBox = styled(Box)(({ theme }) => ({
   },
 }));
 
+const user_id = window.localStorage.getItem("user_id");
+
 const UserComponent = ({ firstName, lastName, _id, online, img }) => {
   const theme = useTheme();
   const name = `${firstName} ${lastName}`;
-  const user_id = window.localStorage.getItem("user_id");
   return (
     <StyledChatBox
       p={2}
@@ -63,7 +64,7 @@ const UserComponent = ({ firstName, lastName, _id, online, img }) => {
               });
             }}
           >
-            const StyledChatBox = styled(Box) Send Request
+            Send Request
           </Button>
         </Stack>
       </Stack>
@@ -167,7 +168,11 @@ const FriendComponent = ({ firstName, lastName, _id, online, img }) => {
           </Stack>
         </Stack>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
-          <IconButton onClick={() => {}}>
+          <IconButton
+            onClick={() => {
+              socket.emit("start_conversation", { to: _id, from: user_id });
+            }}
+          >
             <Chat />
           </IconButton>
         </Stack>
