@@ -3,11 +3,17 @@ import { Avatar, Badge, Box, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { faker } from "@faker-js/faker";
 import StyledBadge from "./StyledBadge";
+import { useDispatch } from "react-redux";
+import { SelectConversation } from "../redux/slices/app";
 
 const ChatElement = ({ id, name, image, msg, time, unread, online }) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
   return (
     <Box
+      onClick={() => {
+        dispatch(SelectConversation({ room_id: id }));
+      }}
       p={2}
       sx={{
         width: "100%",
@@ -16,6 +22,10 @@ const ChatElement = ({ id, name, image, msg, time, unread, online }) => {
           theme.palette.mode === "light"
             ? "#fff"
             : theme.palette.background.paper,
+
+        "&:hover": {
+          cursor: "pointer",
+        },
       }}
     >
       <Stack

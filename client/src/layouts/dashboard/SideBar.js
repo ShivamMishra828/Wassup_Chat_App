@@ -100,9 +100,10 @@ const SideBar = () => {
             direction="column"
             alignItems="center"
           >
-            {Nav_Buttons.map((el) =>
+            {Nav_Buttons.map((el, index) =>
               el.index === selected ? (
                 <Box
+                  key={index}
                   p={1}
                   sx={{
                     backgroundColor: theme.palette.primary.main,
@@ -209,6 +210,7 @@ const SideBar = () => {
             <Stack spacing={1} px={1}>
               {Profile_Menu.map((option, index) => (
                 <MenuItem
+                  key={index}
                   onClick={() => {
                     handleClick();
                   }}

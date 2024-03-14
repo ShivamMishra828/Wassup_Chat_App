@@ -18,7 +18,7 @@ const DashboardLayout = () => {
           window.location.reload();
         }
       };
-      window.reload();
+      //   window.reload;
 
       if (!socket) {
         connectSocket(user_id);
@@ -48,7 +48,7 @@ const DashboardLayout = () => {
       socket.off("request_accepted");
       socket.off("request_sent");
     };
-  }, [isLoggedIn, socket]);
+  }, [isLoggedIn, user_id]);
   if (!isLoggedIn) {
     return <Navigate to="/auth/login" />;
   }

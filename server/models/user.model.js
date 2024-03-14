@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema(
     socket_id: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ["Online", "Offline"],
+    },
   },
   { timestamps: true }
 );

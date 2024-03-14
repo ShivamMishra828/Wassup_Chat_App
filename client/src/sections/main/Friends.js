@@ -6,6 +6,11 @@ import {
   FetchFriends,
   FetchUsers,
 } from "../../redux/slices/app";
+import {
+  FriendComponent,
+  FriendRequestComponent,
+  UserComponent,
+} from "../../components/Friends";
 
 const UsersList = () => {
   const dispatch = useDispatch();
@@ -17,7 +22,7 @@ const UsersList = () => {
   return (
     <>
       {users.map((el, index) => {
-        return <></>;
+        return <UserComponent key={el._id} {...el} />;
       })}
     </>
   );
@@ -34,7 +39,7 @@ const FriendsList = () => {
   return (
     <>
       {friends.map((el, index) => {
-        return <></>;
+        return <FriendComponent key={el._id} {...el} />;
       })}
     </>
   );
@@ -51,7 +56,9 @@ const FriendRequestList = () => {
   return (
     <>
       {friendRequests.map((el, index) => {
-        return <></>;
+        return (
+          <FriendRequestComponent key={el._id} {...el.sender} id={el._id} />
+        );
       })}
     </>
   );

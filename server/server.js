@@ -5,6 +5,7 @@ import connectToDB from "./config/database.js";
 import { Server } from "socket.io";
 import User from "./models/user.model.js";
 import FriendRequest from "./models/friendRequest.model.js";
+import path from "path";
 
 dotenv.config();
 
@@ -34,7 +35,10 @@ io.on("connection", async (socket) => {
   console.log(`User Connected with ID: ${user_id}`);
 
   if (Boolean(user_id)) {
-    await User.findByIdAndUpdate(user_id, { socket_id: socket_id });
+    await User.findByIdAndUpdate(user_id, {
+      socket_id: socket_id,
+      status: "Online",
+    });
   }
 
   socket.on("friend_request", async (data) => {
@@ -78,7 +82,21 @@ io.on("connection", async (socket) => {
     });
   });
 
-  socket.on("end", async () => {
+  socket.on("text_message", async (data) => {});
+
+  socket.on("file_message", async (data) => {
+    const fileExtension = path.extname(data.file.name);
+    const fileName = `${Date.now()}_${Math.floor(
+      Math.random() * 10000
+    )}${fileExtension}`;
+  });
+
+  socket.on("end", async (data) => {
+    if (data.user_id) {
+      await User.findByIdAndUpdate(data.user_id, {
+        status: "Offline",
+      });
+    }
     console.log(`User Disconnected with ID: ${user_id}`);
     socket.disconnect(0);
   });
