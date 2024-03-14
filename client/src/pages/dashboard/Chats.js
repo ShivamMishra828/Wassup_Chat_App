@@ -47,7 +47,7 @@ const Chats = () => {
     socket.emit("get_direct_conversations", { user_id }, (data) => {
       dispatch(FetchDirectConversations({ conversations: data }));
     });
-  }, []);
+  }, [dispatch]);
   return (
     <>
       <Box

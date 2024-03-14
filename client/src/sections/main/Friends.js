@@ -21,7 +21,7 @@ const UsersList = () => {
   const { users } = useSelector((state) => state.app);
   useEffect(() => {
     dispatch(FetchUsers());
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
@@ -37,7 +37,7 @@ const FriendsList = () => {
   const { friends } = useSelector((state) => state.app);
   useEffect(() => {
     dispatch(FetchFriends());
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
@@ -53,7 +53,7 @@ const FriendRequestList = () => {
   const { friendRequests } = useSelector((state) => state.app);
   useEffect(() => {
     dispatch(FetchFriendRequests());
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
