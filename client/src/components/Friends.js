@@ -131,7 +131,15 @@ const FriendRequestComponent = ({
   );
 };
 
-const FriendComponent = ({ firstName, lastName, _id, online, img }) => {
+const FriendComponent = ({
+  firstName,
+  lastName,
+  _id,
+  online,
+  img,
+  incoming,
+  missed,
+}) => {
   const theme = useTheme();
   const name = `${firstName} ${lastName}`;
   return (

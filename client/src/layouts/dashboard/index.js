@@ -33,38 +33,6 @@ const DashboardLayout = () => {
         connectSocket(user_id);
       }
 
-      socket.on("start_chat", (data) => {
-        console.log(data);
-        // add / update to conversation list
-        const existing_conversation = conversations.find(
-          (el) => el.id === data._id
-        );
-        if (existing_conversation) {
-          // update direct conversation
-          dispatch(UpdateDirectConversation({ conversation: data }));
-        } else {
-          // add direct conversation
-          dispatch(AddDirectConversation({ conversation: data }));
-        }
-        dispatch(SelectConversation({ room_id: data._id }));
-      });
-
-      socket.on("open_chat", (data) => {
-        console.log(data);
-        // add / update to conversation list
-        const existing_conversation = conversations.find(
-          (el) => el.id === data._id
-        );
-        if (existing_conversation) {
-          // update direct conversation
-          dispatch(UpdateDirectConversation({ conversation: data }));
-        } else {
-          // add direct conversation
-          dispatch(AddDirectConversation({ conversation: data }));
-        }
-        dispatch(SelectConversation({ room_id: data._id }));
-      });
-
       socket.on("new_friend_request", (data) => {
         toast.success(data.message, {
           duration: 4000,
@@ -84,12 +52,24 @@ const DashboardLayout = () => {
       });
     }
 
+    socket.on("start_chat", (data) => {
+      const existing_conversation = conversations.find(
+        (el) => el.id === data._id
+      );
+
+      if (existing_conversation) {
+        dispatch(UpdateDirectConversation({ conversation: data }));
+      } else {
+        dispatch(AddDirectConversation({ conversation: data }));
+      }
+      dispatch(SelectConversation({ room_id: data._id }));
+    });
+
     return () => {
-      socket.off("new_friend_request");
-      socket.off("request_accepted");
-      socket.off("request_sent");
-      socket.off("open_chat");
-      socket.off("start_chat");
+      socket?.off("new_friend_request");
+      socket?.off("request_accepted");
+      socket?.off("request_sent");
+      socket?.off("start_chat");
     };
   }, [isLoggedIn, user_id, conversations, dispatch]);
   if (!isLoggedIn) {

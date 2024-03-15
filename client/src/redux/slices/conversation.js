@@ -46,7 +46,7 @@ const slice = createSlice({
               (elm) => elm._id.toString() !== user_id
             );
             return {
-              id: this_conversation._id._id,
+              id: this_conversation._id,
               user_id: user._id,
               name: `${user.firstName} ${user.lastName}`,
               online: user.status === "Online",
@@ -61,7 +61,6 @@ const slice = createSlice({
       );
     },
     addDirectConversation(state, action) {
-      console.log("called");
       const this_conversation = action.payload.conversation;
       const user = this_conversation.participants.find(
         (elm) => elm._id.toString() !== user_id

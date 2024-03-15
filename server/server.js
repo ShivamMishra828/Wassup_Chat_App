@@ -93,28 +93,66 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("start_conversation", async (data) => {
-    const { to, from } = data;
-    const existing_conversation = await OneToOneMessage.findOne({
-      participants: { $size: 2, $all: [to, from] },
-    }).populate("participants", "firstName lastName _id email status");
+    try {
+      const { to, from } = data;
+      const existing_conversation = await OneToOneMessage.find({
+        participants: { $size: 2, $all: [to, from] },
+      }).populate("participants", "firstName lastName _id email status");
 
-    if (existing_conversation.length === 0) {
-      let new_chat = await OneToOneMessage.create({
-        participants: [to, from],
-      });
+      if (existing_conversation.length === 0) {
+        let new_chat = await OneToOneMessage.create({
+          participants: [to, from],
+        });
 
-      new_chat = await OneToOneMessage.findById(new_chat._id).populate(
-        "participants",
-        "firstName lastName _id email status"
-      );
+        new_chat = await OneToOneMessage.findById(new_chat._id).populate(
+          "participants",
+          "firstName lastName _id email status"
+        );
 
-      socket.emit("start_chat", new_chat);
-    } else {
-      socket.emit("open_chat", existing_conversation[0]);
+        socket.emit("start_chat", new_chat);
+      } else {
+        console.log(`Existing Conversation: ${existing_conversation[0]}`);
+        socket.emit("start_chat", existing_conversation[0]);
+      }
+    } catch (error) {
+      console.log(`Error Occured while starting conversation: ${error}`);
     }
   });
 
-  socket.on("text_message", async (data) => {});
+  socket.on("get_messages", async (data, callback) => {
+    const { messages } = await OneToOneMessage.findById(
+      data.conversation_id
+    ).select("messages");
+
+    callback(messages);
+  });
+
+  socket.on("text_message", async (data) => {
+    const { to, from, message, conversation_id, type } = data;
+    const to_user = await User.findById(to);
+    const from_user = await User.findById(from);
+    const new_message = {
+      to,
+      from,
+      type,
+      text: message,
+      createdAt: Date.now(),
+    };
+
+    const chat = await OneToOneMessage.findById(conversation_id);
+    chat.messages.push(new_message);
+    await chat.save();
+
+    io.to(to_user.socket_id).emit("new_message", {
+      conversation_id,
+      message: new_message,
+    });
+
+    io.to(from_user.socket_id).emit("new_message", {
+      conversation_id,
+      message: new_message,
+    });
+  });
 
   socket.on("file_message", async (data) => {
     const fileExtension = path.extname(data.file.name);
