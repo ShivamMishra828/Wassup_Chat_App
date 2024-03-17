@@ -15,7 +15,7 @@ const server = createServer(app);
 const PORT = process.env.PORT || 8000;
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
